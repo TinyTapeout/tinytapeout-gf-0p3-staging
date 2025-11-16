@@ -10,6 +10,8 @@ jobs:
   check_submission:
     name: Check user project submission
     runs-on: ubuntu-24.04
+    env:
+      TT_CONFIG: ../../gf180mcuD.yaml
     steps:
       - name: checkout repo
         uses: actions/checkout@v4
@@ -22,10 +24,6 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
       - run: pip install -r tt-multiplexer/py/requirements.txt -r tt/requirements.txt
-
-      - name: Copy multiplexer configuration (temporary)
-        run: |
-          cp gf180mcuD.yaml tt-multiplexer/cfg
 
       - name: Update caravel configuration
         run: python ./tt/configure.py --update-shuttle
