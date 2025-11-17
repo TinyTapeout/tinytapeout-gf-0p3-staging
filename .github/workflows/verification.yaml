@@ -16,7 +16,7 @@ jobs:
     env:
       SKY130_PDK_VERSION: 1341f54f5ce0c4955326297f235e4ace1eb6d419
       PDK_ROOT: /home/runner/pdk
-      TT_CONFIG: ../../gf180mcuD.yaml
+      TT_CONFIG: gf180mcuD.yaml
 
     # ubuntu
     runs-on: ubuntu-24.04

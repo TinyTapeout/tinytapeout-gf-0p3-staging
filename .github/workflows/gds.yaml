@@ -15,8 +15,9 @@ jobs:
   gds:
     env:
       PYTHONIOENCODING: utf-8
-      PDK_ROOT: ${{ github.workspace }}/pdk
-      TT_CONFIG: ../../gf180mcuD.yaml
+      PDK: gf180mcuD
+      PDK_ROOT: ${{ github.workspace }}/gf180mcu
+      TT_CONFIG: gf180mcuD.yaml
       # Uncomment the following line to build only the specified projects:
       #TT_ONLY_PROJECTS: tt_um_chip_rom,tt_um_factory_test
 
@@ -42,16 +43,6 @@ jobs:
           cache: 'pip'
       - run: pip install -r tt-multiplexer/py/requirements.txt -r tt/requirements.txt -r verilog/dv/mux/requirements.txt
 
-      - name: Load LibreLane environment variables
-        run: cat .github/config/librelane.txt | tee -a $GITHUB_ENV
-
-      - name: Checkout LibreLane repo
-        uses: actions/checkout@v4
-        with:
-          repository: librelane/librelane
-          path: librelane
-          ref: ${{ env.LIBRELANE_TAG }}
-
       - name: Update caravel configuration
         run: python ./tt/configure.py --update-shuttle
 
@@ -62,44 +53,34 @@ jobs:
             extra-substituters = https://nix-cache.fossi-foundation.org
             extra-trusted-public-keys = nix-cache.fossi-foundation.org:3+K59iFwXqKsL7BNu6Guy0v+uTlwsxYQxjspXzqLYQs=
 
-      - name: Install SKY130 PDK
-        if: false # Disabled until the mux integration is ready
-        uses: TinyTapeout/ciel-action@v1
-        with:
-          pdk_name: sky130
-          pdk_version: ${{ env.SKY130_PDK_VERSION }}
-          pdk_root: ${{ env.PDK_ROOT }}
-
       # Use LibreLane to build the macros and the final GDS
       - name: Harden Chip ROM
-        if: false # Disabled until the mux integration is ready
         run: nix-shell $GITHUB_WORKSPACE/librelane/shell.nix --run "python -m librelane tt/rom/config.json"
 
       - name: Harden tt_ctrl
-        if: false # Disabled until the mux integration is ready
         working-directory: tt-multiplexer/ol2/tt_ctrl
         run: nix-shell $GITHUB_WORKSPACE/librelane/shell.nix --run "python build.py"
 
       - name: Harden tt_mux
-        if: false # Disabled until the mux integration is ready
         working-directory: tt-multiplexer/ol2/tt_mux
         run: nix-shell $GITHUB_WORKSPACE/librelane/shell.nix --run "python build.py"
 
       - name: Copy macros
-        if: false # Disabled until the mux integration is ready
         run: python ./tt/configure.py --copy-macros
 
       - name: Harden tt_top
-        if: false # Disabled until the mux integration is ready
         working-directory: tt-multiplexer/ol2/tt_top
-        run: nix-shell $GITHUB_WORKSPACE/librelane/shell.nix --run "python build.py --skip-xor-checks"
+        run: nix-shell $GITHUB_WORKSPACE/librelane/shell.nix --run "python build.py"
+
+      - name: Create empty spef file if missing (temporary workaround)
+        run: |
+          LATEST_RUN=$(find tt-multiplexer/ol2/tt_top/runs -name 'RUN_*' | sort | tail -n 1)
+          if [ ! -d "$LATEST_RUN/final/spef" ]; then mkdir -p "$LATEST_RUN/final/spef"; fi
 
       - name: Copy final results
-        if: false # Disabled until the mux integration is ready
         run: python ./tt/configure.py --copy-final-results
 
       - name: Create chipfoundry submission
-        if: false # Disabled until the mux integration is ready
         run: python ./tt/configure.py --create-chipfoundry-submission
 
       - name: upload GDS artifact
@@ -131,7 +112,6 @@ jobs:
           path: shuttle_index.json
 
       - name: upload ChipFoundry submission directory
-        if: false # Disabled until the mux integration is ready
         uses: actions/upload-artifact@v4
         with:
           name: chipfoundry_submission

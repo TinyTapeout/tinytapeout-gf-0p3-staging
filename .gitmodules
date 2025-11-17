@@ -4,3 +4,9 @@
 [submodule "tt"]
 	path = tt
 	url = https://github.com/TinyTapeout/tt-support-tools
+[submodule "gf180mcu"]
+	path = gf180mcu
+	url = https://github.com/wafer-space/gf180mcu
+[submodule "librelane"]
+	path = librelane
+	url = https://github.com/librelane/librelane
