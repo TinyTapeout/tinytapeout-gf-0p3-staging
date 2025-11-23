@@ -89,6 +89,19 @@ jobs:
       - name: Create foundry submission directory
         run: python ./tt/configure.py --create-foundry-submission
 
+      - name: Print build summary
+        run: |
+          OAS_FILE=foundry_submission/oas/*.oas
+          OAS_SIZE=$(stat --printf='%s' $OAS_FILE | numfmt --to=iec --suffix=B)
+          SHA1_SUM=$(sha1sum $OAS_FILE | cut -d' ' -f1)
+          cat <<EOF | tee -a $GITHUB_STEP_SUMMARY
+          ## Build Summary
+          - **Commit:** ${{ github.event.head_commit.id }}
+          - **OAS file:** $(basename $OAS_FILE)
+          - **Size:** $OAS_SIZE
+          - **SHA1:** \`$SHA1_SUM\`
+          EOF
+
       - name: upload GDS artifact
         if: success() || failure()
         uses: actions/upload-artifact@v4
