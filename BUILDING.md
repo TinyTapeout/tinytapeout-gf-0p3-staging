@@ -6,6 +6,7 @@
 export LIBRELANE_ROOT=`pwd`/librelane
 export PDK_ROOT=`pwd`/gf180mcu
 export PDK=gf180mcuD
+export TT_CONFIG=gf180mcuD.yaml:../../mux_overrides.yaml
 ```
 
 Then install LibreLane with Nix, as explained [here](https://librelane.readthedocs.io/en/latest/installation/nix_installation/index.html).
