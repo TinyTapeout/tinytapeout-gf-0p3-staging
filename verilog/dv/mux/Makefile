@@ -17,7 +17,6 @@ WAVES               ?= no
 TOPLEVEL            ?= test_mux_tb
 COCOTB_TEST_MODULES ?= test_mux
 TOPLEVEL_LANG       ?= verilog
-COMPILE_ARGS        += -DMPRJ_IO_PADS=44
 COMPILE_ARGS        += -DSIM
 COMPILE_ARGS        += -DSIM_$(shell echo $(SIM) | tr a-z A-Z)=1
 COMPILE_ARGS        += -DROM_VMEM_PATH=\"../../../tt/rom/rom.vmem\"
@@ -41,7 +40,7 @@ ifeq ($(SIM),verilator)
   endif
 else ifeq ($(SIM),icarus)
   ifeq ($(WAVES),yes)
-    PLUSARGS += +WAVE_FILE=test_mux.vcd
+    COCOTB_PLUSARGS += +WAVE_FILE=test_mux.vcd
   endif
 endif
 
@@ -50,18 +49,19 @@ ifeq ($(GATES),yes)
   COMPILE_ARGS    += -i -f $(abspath ../../includes/includes.gl.mux_top)
   COMPILE_ARGS    += -DGL_TEST
   COMPILE_ARGS    += -DFUNCTIONAL
-  COMPILE_ARGS    += -DUNIT_DELAY=\#1
   COMPILE_ARGS    += -DUSE_POWER_PINS
-  VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v
-  VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
+  VERILOG_SOURCES += $(PDK_ROOT)/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/verilog/primitives.v
+  VERILOG_SOURCES += $(PDK_ROOT)/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/verilog/gf180mcu_fd_sc_mcu7t5v0.v
   SIM_BUILD       := sim_build_gates
 else
   COMPILE_ARGS    += -f $(abspath ../../includes/includes.rtl.caravel_user_project) -I $(abspath ../../rtl/tt-multiplexer/rtl)
-  VERILOG_SOURCES += $(abspath ../../rtl/fast/sky130_fd_sc_hd_fast.v)
 endif
 
 # Standard sources
 VERILOG_SOURCES += $(abspath test_mux_tb.v)
+
+# IO cell library is relevent for both RTL / GL sims
+VERILOG_SOURCES += $(PDK_ROOT)/gf180mcuD/libs.ref/gf180mcu_fd_io/verilog/gf180mcu_fd_io.v
 
 PYTHON_PATHS += $(abspath .)
 export PYTHONPATH := $(subst $(SPACE),:,$(PYTHON_PATHS)):$(PYTHONPATH)

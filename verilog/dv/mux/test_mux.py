@@ -1,9 +1,10 @@
+import binascii
+import os
+import re
+
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import ClockCycles
-import re
-import os
-import binascii
+from cocotb.triggers import ClockCycles, Timer
 
 
 async def enable_design(dut, mux_addr):
@@ -28,20 +29,20 @@ async def enable_design(dut, mux_addr):
 
 
 @cocotb.test()
-async def test_mux(dut):
+async def test_factory_test(dut):
     clock = Clock(dut.clk, 100, unit="ns")  # 10 MHz
     cocotb.start_soon(clock.start())
 
     dut.uio_in.value = 0
     dut.ui_in.value = 0
     # select test design
-    dut.reset_n.value = 0
+    dut.rst_n.value = 0
     await enable_design(dut, 1)
 
     # with bit 0 of ui_in set to 0, module will copy inputs to outputs
     dut.ui_in.value = 0b0
     await ClockCycles(dut.clk, 5)  # wait until the wait state config is read
-    dut.reset_n.value = 1
+    dut.rst_n.value = 1
 
     dut._log.info("test loopback")
     for i in range(256):
@@ -53,16 +54,17 @@ async def test_mux(dut):
     dut.ui_in.value = 0b1
 
     # reset it
-    dut.reset_n.value = 0
-    await ClockCycles(dut.clk, 5)  # wait until the wait state config is read
-    dut.reset_n.value = 1
-    await ClockCycles(dut.clk, 2)  # sync
+    dut.rst_n.value = 0
+    dut.uio_in.value = "z" * 8  # set uio pins to high-Z, so the DUT can drive them
+    await Timer(10, unit="ns")  # Async reset pulse
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 2)  # Wait for counter to reset
 
     dut._log.info("test counter")
     for i in range(256):
         assert dut.uo_out.value == dut.uio_out.value
         assert dut.uo_out.value == i
-        await ClockCycles(dut.clk, 1)  # wait until the wait state config is read
+        await ClockCycles(dut.clk, 1)  # Next count
 
 
 @cocotb.test()
@@ -73,11 +75,11 @@ async def test_rom(dut):
     dut.uio_in.value = 0
     dut.ui_in.value = 0
     # select ROM design
-    dut.reset_n.value = 0
+    dut.rst_n.value = 0
     await enable_design(dut, 0)
 
     await ClockCycles(dut.clk, 1)
-    dut.reset_n.value = 1
+    dut.rst_n.value = 1
     await ClockCycles(dut.clk, 1)
 
     dut._log.info("Read ROM, addressing with ui_in (rst_n=1)")
@@ -88,7 +90,8 @@ async def test_rom(dut):
         rom_data[byte_idx] = dut.uo_out.value
 
     dut._log.info(f"Read ROM, addressing sequentially (rst_n=0)")
-    dut.reset_n.value = 0
+    await Timer(10, unit="ns")  # Async reset pulse
+    dut.rst_n.value = 0
     rom_data_seq = bytearray(256)
     for byte_idx in range(len(rom_data_seq)):
         await ClockCycles(dut.clk, 1)
@@ -102,9 +105,10 @@ async def test_rom(dut):
         key, value = line.split("=", 2)
         items[key] = value
 
-    dut._log.info(f"ROM start bytes: {binascii.hexlify(rom_data[:32], ' ').decode('ascii')}")
+    dut._log.info(
+        f"ROM start bytes: {binascii.hexlify(rom_data[:32], ' ').decode('ascii')}"
+    )
     dut._log.info(f"ROM text data: {items}")
-
 
     assert "shuttle" in items
     assert "repo" in items
@@ -116,7 +120,7 @@ async def test_rom(dut):
     assert re.match("^[0-9a-f]{8}$", items["commit"]) != None
 
     magic = rom_data[248:252]
-    assert magic == b"TT\xFA\xBB"
+    assert magic == b"TT\xfa\xbb"
 
     crc32 = int.from_bytes(rom_data[252:256], "little")
     assert crc32 == binascii.crc32(rom_data[0:252])

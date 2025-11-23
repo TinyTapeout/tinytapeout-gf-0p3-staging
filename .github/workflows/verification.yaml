@@ -14,8 +14,8 @@ on:
 jobs:
   verification:
     env:
-      SKY130_PDK_VERSION: 1341f54f5ce0c4955326297f235e4ace1eb6d419
-      PDK_ROOT: /home/runner/pdk
+      PDK: gf180mcuD
+      PDK_ROOT: ${{ github.workspace }}/gf180mcu
       TT_CONFIG: gf180mcuD.yaml
 
     # ubuntu
@@ -33,12 +33,6 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
       - run: pip install -r tt/requirements.txt -r tt-multiplexer/py/requirements.txt -r verilog/dv/mux/requirements.txt
-
-      - name: Install sky130A PDK
-        uses: TinyTapeout/ciel-action@v1
-        with:
-          pdk_version: ${{ env.SKY130_PDK_VERSION }}
-          pdk_root: ${{ env.PDK_ROOT }}
 
       - name: install iverilog
         run: sudo apt-get update && sudo apt-get install -y iverilog

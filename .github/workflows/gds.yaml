@@ -128,11 +128,13 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y iverilog
 
       - name: GL simulation
-        if: false # Disabled until the mux integration is ready
         working-directory: verilog/dv/mux
         env:
           EXPECTED_REPO: ${{ github.repository }}
         run: |
+          # temporary workaround for missing bits in pad_raw:
+          sed -i 's/inout \[69:0\] pad_raw/inout [73:0] pad_raw/' ../../../foundry_submission/verilog/gl/tt_gf_wrapper.v
+
           make clean test_mux_gl WAVES=yes
           # make will return success even if the test fails, so check for failure in the results.xml
           ! grep failure results.xml
