@@ -38,10 +38,10 @@ python tt/configure.py --update-shuttle
 Run the following commands to download the required macro files from wafer.space:
 
 ```bash
-wget -O tt-multiplexer/ol2/tt_top/gds/gf180mcu_ws_ip__id.gds https://raw.githubusercontent.com/wafer-space/gf180mcu-project-template/refs/tags/1.2.3/ip/gf180mcu_ws_ip__id/gds/gf180mcu_ws_ip__id.gds
-wget -O tt-multiplexer/ol2/tt_top/lef/gf180mcu_ws_ip__id.lef https://raw.githubusercontent.com/wafer-space/gf180mcu-project-template/refs/tags/1.2.3/ip/gf180mcu_ws_ip__id/lef/gf180mcu_ws_ip__id.lef
-wget -O tt-multiplexer/ol2/tt_top/gds/gf180mcu_ws_ip__logo.gds https://raw.githubusercontent.com/wafer-space/gf180mcu-project-template/refs/tags/1.2.3/ip/gf180mcu_ws_ip__logo/gds/gf180mcu_ws_ip__logo.gds
-wget -O tt-multiplexer/ol2/tt_top/lef/gf180mcu_ws_ip__logo.lef https://raw.githubusercontent.com/wafer-space/gf180mcu-project-template/refs/tags/1.2.3/ip/gf180mcu_ws_ip__logo/lef/gf180mcu_ws_ip__logo.lef
+wget -O tt-multiplexer/ol2/tt_top/gds/gf180mcu_ws_ip__id.gds https://raw.githubusercontent.com/wafer-space/gf180mcu-project-template/refs/tags/1.3.1/ip/gf180mcu_ws_ip__id/gds/gf180mcu_ws_ip__id.gds
+wget -O tt-multiplexer/ol2/tt_top/lef/gf180mcu_ws_ip__id.lef https://raw.githubusercontent.com/wafer-space/gf180mcu-project-template/refs/tags/1.3.1/ip/gf180mcu_ws_ip__id/lef/gf180mcu_ws_ip__id.lef
+wget -O tt-multiplexer/ol2/tt_top/gds/gf180mcu_ws_ip__logo.gds https://raw.githubusercontent.com/wafer-space/gf180mcu-project-template/refs/tags/1.3.1/ip/gf180mcu_ws_ip__logo/gds/gf180mcu_ws_ip__logo.gds
+wget -O tt-multiplexer/ol2/tt_top/lef/gf180mcu_ws_ip__logo.lef https://raw.githubusercontent.com/wafer-space/gf180mcu-project-template/refs/tags/1.3.1/ip/gf180mcu_ws_ip__logo/lef/gf180mcu_ws_ip__logo.lef
 ```
 
 ## Harden
