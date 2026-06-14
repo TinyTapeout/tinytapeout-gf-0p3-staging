@@ -6,3 +6,12 @@ modules:
   - name: 'factory_test' # Factory test module, address 1
     mux_id: 0
     blk_id: 1
+  # Art containing modules that needs to be carefully placed so they don't get flipped/mirrored:
+  - name: 'oscillating_bones'
+    mux_id: 9
+    blk_id: 6
+    width: 1
+    height: 2
+    pg_vaa: false
+    analog:
+      0: null
