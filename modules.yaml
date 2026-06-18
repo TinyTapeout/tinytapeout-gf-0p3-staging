@@ -29,3 +29,14 @@ modules:
     pg_vaa: false
     analog:
       0: null
+  # Extra analog pins to avoid long wiring to the enable signal that creates antenna violations:
+  - name: MichaelBell_tinyQV
+    width: 4
+    height: 2
+    analog:
+      0: null
+      1: null
+      2: null
+      3: null
+      4: null
+    pg_vaa: false
